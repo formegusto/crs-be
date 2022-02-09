@@ -1,4 +1,6 @@
 import requests as req
+from common import file_name
+import os
 
 
 def update_process(type):
@@ -6,6 +8,8 @@ def update_process(type):
         def wrap(*args, **kwargs):
             api_server = "http://localhost:8080"
             update_path = "/process"
+            print("update_process decorator ,pid: {}, filename: {}".format(
+                os.getpid(), file_name))
 
             # try:
             #     result = func(*args, **kwargs)

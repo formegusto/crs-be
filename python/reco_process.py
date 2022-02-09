@@ -1,5 +1,6 @@
 from utils import *
 import sys
+from common import file_name
 
 
 @update_process("reco-process-start")
@@ -8,7 +9,6 @@ def start():
 
 
 if __name__ == "__main__":
-
     file_name = sys.argv[1]
 
     start()
