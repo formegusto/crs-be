@@ -2,6 +2,9 @@ import http from "http";
 import express from "express";
 import morgan from "morgan";
 import SocketConnect from "./Socket";
+import routes from "./routes";
+import cors from "cors";
+import mongooseInit from "./models";
 
 class App {
   server: http.Server;
@@ -11,16 +14,19 @@ class App {
     this.app = express();
 
     this.SettingMW();
-    this.SetRoutes;
+    this.SetRoutes();
 
     this.server = http.createServer(this.app);
   }
 
   SettingMW() {
+    this.app.use(cors());
     this.app.use(morgan("dev"));
   }
 
-  SetRoutes() {}
+  SetRoutes() {
+    this.app.use(routes);
+  }
 
   Start() {
     const port = process.env.PORT || "8080";
