@@ -3,7 +3,7 @@ import express from "express";
 import { Server } from "socket.io";
 
 function SocketConnect(server: http.Server, app: express.Application) {
-  const io = new Server({
+  const io = new Server(server, {
     path: "/alert.io",
     cors: {
       origin: "http://localhost:3000",
