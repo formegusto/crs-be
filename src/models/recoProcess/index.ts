@@ -8,6 +8,8 @@ const schema = new Schema<RecoProcess>(
     minPer: { type: Number, required: true },
     maxPer: { type: Number, required: true },
     step: { type: String, required: true },
+    createdAt: { type: String, required: true },
+    updatedAt: { type: String, required: true },
   },
   {
     collection: "process",

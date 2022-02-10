@@ -5,6 +5,7 @@ import RecoProcessModel from "../models/recoProcess";
 import { RecoProcess } from "../models/recoProcess/types";
 import childProcess from "child_process";
 import recoProcess from "./recoProcess";
+import moment from "moment-timezone";
 
 class Routes {
   routes: express.Router;
@@ -37,11 +38,14 @@ class Routes {
       async (req: express.Request, res: express.Response) => {
         const filename = req.file?.filename;
 
+        const startDate = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss");
         if (filename) {
           const regist: RecoProcess = {
             ...req.body,
             dataName: filename,
-            step: "load-excel",
+            step: "init",
+            createdAt: startDate,
+            updatedAt: startDate,
           };
 
           const recoProcessInfo = await RecoProcessModel.create(regist);

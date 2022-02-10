@@ -10,4 +10,6 @@ export type RecoProcess = {
     | "normal analysis"
     | "mean analysis"
     | "similarity analysis";
+  createdAt: string;
+  updatedAt: string;
 };
