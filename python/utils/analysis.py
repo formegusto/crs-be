@@ -79,7 +79,6 @@ def set_analysis(result):
     return anal_result
 
 
-@update_process("analysis")
 def analysis(result):
     return {
         "mean": set_mean(result),

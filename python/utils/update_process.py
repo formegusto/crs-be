@@ -1,16 +1,13 @@
 import requests as req
-from common import file_name
 import os
 
 
-def update_process(type):
+def update_process(type, id):
     def decorator(func):
         def wrap(*args, **kwargs):
+            print("pid: {} / type: {} / id: {}".format(os.getpid(), type, id))
             api_server = "http://localhost:8080"
             update_path = "/process"
-            print("update_process decorator ,pid: {}, filename: {}".format(
-                os.getpid(), file_name))
-
             # try:
             #     result = func(*args, **kwargs)
 
@@ -29,6 +26,7 @@ def update_process(type):
             result = func(*args, **kwargs)
 
             req.patch(api_server + update_path, json={
+                "id": id,
                 "type": type,
                 "status": True
             })

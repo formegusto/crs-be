@@ -4,7 +4,6 @@ from models import *
 from utils.update_process import update_process
 
 
-@update_process("bill-calc")
 def bill_calc(month_usage_df, peak_df, min_per, max_per):
     analysis_df = month_usage_df.set_index("month")
 

@@ -47,9 +47,15 @@ class Routes {
           const recoProcessInfo = await RecoProcessModel.create(regist);
           const id = recoProcessInfo.id;
 
+          const recoProcessArgv = {
+            id,
+            min_per: req.body.minPer,
+            max_per: req.body.maxPer,
+            file_name: filename,
+          };
           const recoProcess = childProcess.spawn("python3", [
             "python/reco_process.py",
-            filename,
+            JSON.stringify(recoProcessArgv),
           ]);
 
           recoProcess.stdout.on("data", (data) => {

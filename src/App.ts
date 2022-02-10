@@ -22,6 +22,7 @@ class App {
   SettingMW() {
     this.app.use(cors());
     this.app.use(morgan("dev"));
+    this.app.use(express.json());
   }
 
   SetRoutes() {

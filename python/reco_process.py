@@ -1,25 +1,47 @@
 from utils import *
 import sys
-from common import file_name
+import json
 
 
-@update_process("reco-process-start")
 def start():
     return
 
 
+step_process = [start, load_excel, data_preprocessing, bill_calc,
+                normal_analysis, mean_analysis, similarity_analysis]
+step_names = ['start', 'load-excel', 'data-preprocessing', 'bill-calc',
+              'normal-analysis', 'mean-analysis', 'similarity-analysis']
+
+
+class reco_process:
+    def __init__(self, min_per, max_per, file_name, id):
+        self.min_per = int(min_per)
+        self.max_per = int(max_per)
+        self.id = id
+        self.file_name = file_name
+        self.fn = dict()
+
+        for idx, sp in enumerate(step_process):
+            sn = step_names[idx]
+            self.fn[sn] = update_process(sn, id)(sp)
+
+
 if __name__ == "__main__":
-    file_name = sys.argv[1]
+    argv = json.loads(sys.argv[1])
 
-    start()
-    xlsx = load_excel(file_name)
-    p, m = data_preprocessing(xlsx)
+    rp = reco_process(argv['min_per'], argv['max_per'],
+                      argv['file_name'], argv['id'])
+    step = step_names.copy()
+    rp.fn[step[0]]()
 
-    min_per = 10
-    max_per = 80
-    bc_result = bill_calc(m, p, min_per, max_per)
+    xlsx = rp.fn[step[1]](rp.file_name)
 
-    na_result = normal_analysis(bc_result)
+    p, m = rp.fn[step[2]](xlsx)
 
-    mean_result = mean_analysis(m, p, min_per, max_per)
-    anal_result = similarity_analysis(m, p, min_per, max_per)
+    bc_result = rp.fn[step[3]](m, p, rp.min_per, rp.max_per)
+
+    na_result = rp.fn[step[4]](bc_result)
+
+    mean_result = rp.fn[step[5]](m, p, rp.min_per, rp.max_per)
+
+    anal_result = rp.fn[step[6]](m, p, rp.min_per, rp.max_per)

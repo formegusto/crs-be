@@ -13,7 +13,6 @@ from utils.update_process import update_process
 # -- 손실율
 
 
-@update_process("normal-analysis")
 def get_analysis(bc_result, pos_cnt, loss_ratio):
     bill = bc_result['bill']
     public_bill = bc_result['public_bill']
