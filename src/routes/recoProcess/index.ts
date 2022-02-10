@@ -15,7 +15,22 @@ class ProcessRoutes {
     this.routes.get(
       "/",
       async (req: express.Request, res: express.Response) => {
-        const recoProcess = await RecoProcessModel.find();
+        const recoProcess = await RecoProcessModel.find().sort({
+          createdAt: -1,
+        });
+
+        return res.status(200).json({
+          status: true,
+          data: recoProcess,
+        });
+      }
+    );
+
+    this.routes.get(
+      "/:id",
+      async (req: express.Request, res: express.Response) => {
+        const { id } = req.params;
+        const recoProcess = await RecoProcessModel.findById(id);
 
         return res.status(200).json({
           status: true,

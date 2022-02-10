@@ -74,9 +74,7 @@ class Routes {
           return res.status(200).json({
             status: true,
             message: "추천 서비스를 시작합니다.",
-            datas: {
-              registData: recoProcessInfo.toJSON(),
-            },
+            data: recoProcessInfo.toJSON(),
           });
         }
 

@@ -31,7 +31,8 @@ def update_process(type, id):
             result = func(*args, **kwargs)
             req.patch(api_server + update_path, json={
                 "id": id,
-                "type": type,
+                "step": type,
+                "type": "change step",
                 "status": True
             })
 

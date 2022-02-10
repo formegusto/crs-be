@@ -4,12 +4,14 @@ export type RecoProcess = {
   minPer: number;
   maxPer: number;
   step:
-    | "load excel"
-    | "data preprocessing"
-    | "bill calc"
-    | "normal analysis"
-    | "mean analysis"
-    | "similarity analysis";
+    | "init"
+    | "start"
+    | "load-excel"
+    | "data-preprocessing"
+    | "bill-calc"
+    | "normal-analysis"
+    | "mean-analysis"
+    | "similarity-analysis";
   createdAt: string;
   updatedAt: string;
 };
