@@ -41,7 +41,7 @@ class Routes {
           const regist: RecoProcess = {
             ...req.body,
             dataName: filename,
-            step: "load excel",
+            step: "load-excel",
           };
 
           const recoProcessInfo = await RecoProcessModel.create(regist);

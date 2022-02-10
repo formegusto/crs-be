@@ -1,5 +1,6 @@
 import express from "express";
 import { Socket } from "socket.io";
+import RecoProcessModel from "../../models/recoProcess";
 
 class ProcessRoutes {
   routes: express.Router;
@@ -10,6 +11,18 @@ class ProcessRoutes {
   }
 
   SetRoutes() {
+    this.routes.get(
+      "/",
+      async (req: express.Request, res: express.Response) => {
+        const recoProcess = await RecoProcessModel.find();
+
+        return res.status(200).json({
+          status: true,
+          data: recoProcess,
+        });
+      }
+    );
+
     this.routes.patch("/", (req: express.Request, res: express.Response) => {
       const body = <UpdateProcess>req.body;
       console.log(body);
