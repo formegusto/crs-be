@@ -11,6 +11,7 @@ step_process = [start, load_excel, data_preprocessing, bill_calc,
                 normal_analysis, mean_analysis, similarity_analysis]
 step_names = ['start', 'load-excel', 'data-preprocessing', 'bill-calc',
               'normal-analysis', 'mean-analysis', 'similarity-analysis']
+step_db_save = [False, False, True, False, False, True, True]
 
 
 class reco_process:
@@ -23,7 +24,8 @@ class reco_process:
 
         for idx, sp in enumerate(step_process):
             sn = step_names[idx]
-            self.fn[sn] = update_process(sn, id)(sp)
+            ds = step_db_save[idx]
+            self.fn[sn] = update_process(sn, id, ds)(sp)
 
 
 if __name__ == "__main__":
@@ -31,17 +33,20 @@ if __name__ == "__main__":
 
     rp = reco_process(argv['min_per'], argv['max_per'],
                       argv['file_name'], argv['id'])
+
     step = step_names.copy()
     rp.fn[step[0]]()
 
     xlsx = rp.fn[step[1]](rp.file_name)
 
-    p, m = rp.fn[step[2]](xlsx)
+    p, m, d = rp.fn[step[2]](xlsx, db_processing=True)
 
     bc_result = rp.fn[step[3]](m, p, rp.min_per, rp.max_per)
 
     na_result = rp.fn[step[4]](bc_result)
 
-    mean_result = rp.fn[step[5]](m, p, rp.min_per, rp.max_per)
+    mean_result = rp.fn[step[5]](
+        m, p, rp.min_per, rp.max_per, db_processing=True)
 
-    anal_result = rp.fn[step[6]](m, p, rp.min_per, rp.max_per)
+    anal_result = rp.fn[step[6]](
+        m, p, rp.min_per, rp.max_per, db_processing=True)

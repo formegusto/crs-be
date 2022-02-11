@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
-from utils import bill_calc, normal_analysis, improved_similarity
+from utils import *
 from sklearn.decomposition import TruncatedSVD
-from utils.update_process import update_process
 
 
 def get_reco_idx(month_usage_df):
@@ -38,7 +37,7 @@ def get_reco_idx(month_usage_df):
     return recos
 
 
-def similarity_analysis(month_usage_df, peak_df, min_per, max_per):
+def similarity_analysis(month_usage_df, peak_df, min_per, max_per, db_processing=False):
     recos = get_reco_idx(month_usage_df)
     analysis_targets = month_usage_df.set_index(
         "month").iloc[recos].copy()
@@ -48,5 +47,11 @@ def similarity_analysis(month_usage_df, peak_df, min_per, max_per):
 
     bc_result = bill_calc(mean_df, peak_df, min_per, max_per)
     na_result = normal_analysis(bc_result)
+
+    if db_processing:
+        anal_analysis = analysis_processing_single((bc_result, na_result))
+        return {
+            "simAnalysis": anal_analysis
+        }
 
     return bc_result, na_result

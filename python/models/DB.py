@@ -14,6 +14,15 @@ class DB:
         self.conn = mc(mongo_uri).crs
         self.pro_col = self.conn.process
 
+    def save_new_process(self, id, in_db):
+        query = {
+            "_id": ObjectId(id)
+        }
+        newvalues = {
+            "$set": in_db
+        }
+        self.pro_col.update_one(query, newvalues)
+
     def process_step_update(self, id, step):
         update_time = dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
         query = {

@@ -1,9 +1,36 @@
 import pandas as pd
 import datetime as dt
 from utils.update_process import update_process
+from common.calc_datas import db_process
 
 
-def data_preprocessing(xlsx):
+def analysis_processing_single(result):
+    in_db = dict()
+    in_db['changePer'] = dict()
+    for main_target, sub_target, item_name in db_process:
+        items = dict()
+
+        for contract in ['comp', 'single']:
+            percentages = result[main_target][sub_target][contract].columns.tolist(
+            )
+            values = result[main_target][sub_target][contract].values.reshape(
+                -1).tolist()
+
+            item = [{
+                "percentage": int(percentage),
+                "value": values[idx]
+            } for idx, percentage in enumerate(percentages)]
+
+            items[contract] = item
+
+        change_per = int(result[1]['pos_change_per'][sub_target][0])
+        in_db[item_name] = items
+        in_db['changePer'][item_name] = change_per
+
+    return in_db
+
+
+def data_preprocessing(xlsx, db_processing=False):
     date_df = xlsx[3:][xlsx.columns[1:6]].copy()
     household_df = xlsx[xlsx.columns[7:]]
 
@@ -53,7 +80,48 @@ def data_preprocessing(xlsx):
             for month in range(1, 13)
         ]
 
+    if db_processing:
+        peaks = list()
+        for idx in peak_df.index:
+            month = peak_df.loc[idx]['month']
+            peak = peak_df.loc[idx]['peak (kW)']
+            in_dict = dict({
+                "month": month,
+                "peak": peak
+            })
+
+            peaks.append(in_dict)
+
+        month_idx_m = month_usage_df.set_index("month")
+        month_usages = list()
+        for idx in month_idx_m.index:
+            month = idx
+            households_name = month_idx_m.columns.values.tolist()
+            households_kwh = month_idx_m.loc[idx].values.tolist()
+
+            in_dict = dict({
+                "month": month,
+                "name": households_name,
+                "kwh": households_kwh
+            })
+
+            month_usages.append(in_dict)
+
+        in_db = {
+            "peak": peaks,
+            "month_usage": month_usages
+        }
+
+        return (
+            peak_df,
+            month_usage_df,
+            {
+                "dpp": in_db
+            }
+        )
+
     return (
         peak_df,
-        month_usage_df
+        month_usage_df,
+        None
     )

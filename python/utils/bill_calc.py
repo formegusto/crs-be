@@ -119,6 +119,7 @@ def bill_calc(month_usage_df, peak_df, min_per, max_per):
         )
 
         count = month_datas_df['usage (kWh)'].count()
+        kwh_sum = round(month_datas_df['usage (kWh)'].sum())
         mean = round(month_datas_df['usage (kWh)'].mean())
         std = round(month_datas_df['usage (kWh)'].std())
         rsd = round(std/mean * 100)
@@ -127,6 +128,7 @@ def bill_calc(month_usage_df, peak_df, min_per, max_per):
 
         infos = {
             "count": count,
+            "sum": kwh_sum,
             "mean": mean,
             "std": std,
             "rsd": rsd
