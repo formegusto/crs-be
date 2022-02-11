@@ -4,3 +4,5 @@ db_process = [
     (0, 'bill', 'bill'),
     (0, 'public_bill', 'publicBill')
 ]
+
+contract = ['comp', 'single']

@@ -15,7 +15,17 @@ class ProcessRoutes {
     this.routes.get(
       "/",
       async (req: express.Request, res: express.Response) => {
-        const recoProcess = await RecoProcessModel.find().sort({
+        const recoProcess = await RecoProcessModel.find(
+          {},
+          {
+            title: 1,
+            minPer: 1,
+            maxPer: 1,
+            kwh: 1,
+            recoPercentage: 1,
+            meanAnalysis: { positiveCount: 1 },
+          }
+        ).sort({
           createdAt: -1,
         });
 
