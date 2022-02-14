@@ -3,6 +3,24 @@ import datetime as dt
 from common.calc_datas import db_process, contract
 import numpy as np
 
+# info : df index에 month 설정이 되어있어야함
+
+
+def generate_month_usage(df):
+    month_usages = list()
+
+    for name in df.columns.tolist():
+        values = dict()
+        kwhs = df[name]
+
+        values['name'] = name
+        for month in kwhs.index:
+            values['{}'.format(month)] = int(kwhs[month])
+
+        month_usages.append(values)
+
+    return month_usages
+
 
 def analysis_processing_single(result, hist_df):
     in_db = dict()
@@ -102,27 +120,16 @@ def data_preprocessing(xlsx, db_processing=False):
             peaks.append(in_dict)
 
         month_idx_m = month_usage_df.set_index("month")
-        month_usages = list()
-        for name in month_idx_m.columns.tolist():
-            values = dict()
-            kwhs = month_idx_m[name].values.tolist()
-
-            values['name'] = name
-            for month, kwh in enumerate(kwhs):
-                values['{}'.format(month + 1)] = kwh
-
-            month_usages.append(values)
-
-        in_db = {
-            "peak": peaks,
-            "month_usage": month_usages
-        }
+        month_usages = generate_month_usage(month_idx_m)
 
         return (
             peak_df,
             month_usage_df,
             {
-                "dpp": in_db
+                "dpp": {
+                    "peak": peaks,
+                    "monthUsage": month_usages,
+                }
             }
         )
 
