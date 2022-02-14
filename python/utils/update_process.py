@@ -1,5 +1,6 @@
 import requests as req
 import os
+from lib import message_generator
 from models import DB
 
 db = DB()
@@ -10,6 +11,7 @@ def update_process(step, id, db_save):
         def wrap(*args, **kwargs):
             print("pid: {} / type: {} / id: {}".format(os.getpid(), step, id))
             db.process_step_update(id, step)
+            mg = message_generator(id, step)
 
             api_server = "http://localhost:8080"
             update_path = "/process"
@@ -43,7 +45,8 @@ def update_process(step, id, db_save):
                 "id": id,
                 "step": step,
                 "type": "process success",
-                "status": True
+                "status": True,
+                "message": mg.success
             })
 
             return result

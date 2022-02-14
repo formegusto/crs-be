@@ -14,6 +14,12 @@ class DB:
         self.conn = mc(mongo_uri).crs
         self.pro_col = self.conn.process
 
+    def find_process(self, id):
+        query = {
+            "_id": ObjectId(id)
+        }
+        return self.pro_col.find_one(query)
+
     def save_new_process(self, id, in_db):
         query = {
             "_id": ObjectId(id)

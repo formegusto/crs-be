@@ -55,7 +55,6 @@ def similarity_analysis(month_usage_df, peak_df, min_per, max_per, db_processing
             (bc_result, na_result), hist_df)
         month_usage = generate_month_usage(analysis_targets)
         return {
-            "recoIdx": recos.tolist(),
             "simAnalysis": {
                 "analysisData": anal_analysis,
                 "recoIdx": recos.tolist(),
