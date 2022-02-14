@@ -4,7 +4,8 @@ from utils import *
 
 def mean_analysis(month_usage_df, peak_df, min_per, max_per, db_processing=False):
     analysis_targets = month_usage_df.set_index("month").copy()
-    mean_df = pd.DataFrame(analysis_targets.mean().round()).T
+    hist_df = pd.DataFrame(analysis_targets.mean(axis=0).round())
+    mean_df = hist_df.copy().T
 
     mean_df['month'] = 1
 
@@ -12,7 +13,8 @@ def mean_analysis(month_usage_df, peak_df, min_per, max_per, db_processing=False
     na_result = normal_analysis(bc_result)
 
     if db_processing:
-        mean_analysis = analysis_processing_single((bc_result, na_result))
+        mean_analysis = analysis_processing_single(
+            (bc_result, na_result), hist_df)
         reco_percentage = mean_analysis['changePer']['positiveCount']
         return {
             "kwh": bc_result['information'][0]['sum'],

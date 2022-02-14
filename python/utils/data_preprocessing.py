@@ -1,22 +1,33 @@
 import pandas as pd
 import datetime as dt
-from utils.update_process import update_process
 from common.calc_datas import db_process, contract
+import numpy as np
 
 
-def analysis_processing_single(result):
+def analysis_processing_single(result, hist_df):
     in_db = dict()
     in_db['changePer'] = dict()
+
+    # histogram data
+    y, x = np.histogram(hist_df.values, bins=10)
+    y = np.append(y, 0)
+
+    x = x.tolist()
+    y = y.tolist()
+
+    histogram = [{"x": _, "y": y[idx]} for idx, _ in enumerate(x)]
+    in_db['histogram'] = histogram
+
     for main_target, sub_target, item_name in db_process:
-        percentages = result[main_target][sub_target][contract[0]].columns.tolist(
-        )
+        percentages = ["{}%".format(_) for _ in result[main_target][sub_target][contract[0]].columns.tolist(
+        )]
         comp_values = result[main_target][sub_target][contract[0]].values.reshape(
             -1).tolist()
         single_values = result[main_target][sub_target][contract[1]].values.reshape(
             -1).tolist()
 
         item = [{
-            "percentage": int(percentage),
+            "percentage": percentage,
             "comp": comp_values[idx],
             "single": single_values[idx]
         } for idx, percentage in enumerate(percentages)]
@@ -92,18 +103,15 @@ def data_preprocessing(xlsx, db_processing=False):
 
         month_idx_m = month_usage_df.set_index("month")
         month_usages = list()
-        for idx in month_idx_m.index:
-            month = idx
-            households_name = month_idx_m.columns.values.tolist()
-            households_kwh = month_idx_m.loc[idx].values.tolist()
+        for name in month_idx_m.columns.tolist():
+            values = dict()
+            kwhs = month_idx_m[name].values.tolist()
 
-            in_dict = dict({
-                "month": month,
-                "name": households_name,
-                "kwh": households_kwh
-            })
+            values['name'] = name
+            for month, kwh in enumerate(kwhs):
+                values['{}'.format(month + 1)] = kwh
 
-            month_usages.append(in_dict)
+            month_usages.append(values)
 
         in_db = {
             "peak": peaks,

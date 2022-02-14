@@ -41,7 +41,8 @@ def similarity_analysis(month_usage_df, peak_df, min_per, max_per, db_processing
     recos = get_reco_idx(month_usage_df)
     analysis_targets = month_usage_df.set_index(
         "month").iloc[recos].copy()
-    mean_df = pd.DataFrame(analysis_targets.mean(axis=0).round()).T
+    hist_df = pd.DataFrame(analysis_targets.mean(axis=0).round())
+    mean_df = hist_df.copy().T
 
     mean_df['month'] = 1
 
@@ -49,7 +50,8 @@ def similarity_analysis(month_usage_df, peak_df, min_per, max_per, db_processing
     na_result = normal_analysis(bc_result)
 
     if db_processing:
-        anal_analysis = analysis_processing_single((bc_result, na_result))
+        anal_analysis = analysis_processing_single(
+            (bc_result, na_result), hist_df)
         return {
             "simAnalysis": anal_analysis
         }

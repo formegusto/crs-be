@@ -22,6 +22,7 @@ class ProcessRoutes {
             minPer: 1,
             maxPer: 1,
             kwh: 1,
+            step: 1,
             recoPercentage: 1,
             meanAnalysis: { positiveCount: 1 },
           }
