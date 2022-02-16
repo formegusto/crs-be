@@ -2,6 +2,7 @@ import pandas as pd
 import datetime as dt
 from common.calc_datas import db_process, contract
 import numpy as np
+import math as mt
 
 # info : df index에 month 설정이 되어있어야함
 
@@ -27,7 +28,9 @@ def analysis_processing_single(result, hist_df):
     in_db['changePer'] = dict()
 
     # histogram data
-    y, x = np.histogram(hist_df.values, bins=10)
+    hist_values = hist_df.values
+    bins = 11
+    y, x = np.histogram(hist_values, bins=bins)
     x_round = x.round()
     x_str = list()
 
@@ -36,11 +39,35 @@ def analysis_processing_single(result, hist_df):
             "{}kWh~{}kWh".format(int(x_round[idx]), int(x_round[idx + 1] - 1))
         )
 
+    mean_value = hist_values[np.abs(
+        (hist_values - hist_values.mean())).argmin()]
+    hist_mean = 0
+    hist_mean = mt.floor(bins / 2)
+    for idx in range(len(x - 1)):
+        if (x[idx] < mean_value) and (x[idx + 1] >= mean_value):
+            hist_mean = idx
+            break
+
     x = x_str
+    hist_mean = idx
+
+    hist_min_sum = y[:hist_mean].sum()
+    hist_max_sum = y[hist_mean + 1:].sum()
+    hist_win = ""
+
+    if hist_min_sum > hist_max_sum:
+        hist_win = "min"
+    elif hist_min_sum < hist_max_sum:
+        hist_win = "max"
+    else:
+        hist_win = "draw"
+
     y = y.tolist()
 
     histogram = [{"x": _, "y": y[idx]} for idx, _ in enumerate(x)]
     in_db['histogram'] = histogram
+    in_db['histMean'] = hist_mean
+    in_db['histWin'] = hist_win
 
     for main_target, sub_target, item_name in db_process:
         percentages = ["{}%".format(_) for _ in result[main_target][sub_target][contract[0]].columns.tolist(
