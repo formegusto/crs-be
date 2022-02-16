@@ -28,9 +28,15 @@ def analysis_processing_single(result, hist_df):
 
     # histogram data
     y, x = np.histogram(hist_df.values, bins=10)
-    y = np.append(y, 0)
+    x_round = x.round()
+    x_str = list()
 
-    x = x.tolist()
+    for idx in range(len(x_round) - 1):
+        x_str.append(
+            "{}kWh~{}kWh".format(int(x_round[idx]), int(x_round[idx + 1] - 1))
+        )
+
+    x = x_str
     y = y.tolist()
 
     histogram = [{"x": _, "y": y[idx]} for idx, _ in enumerate(x)]
