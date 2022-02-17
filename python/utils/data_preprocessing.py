@@ -23,14 +23,58 @@ def generate_month_usage(df):
     return month_usages
 
 
+def get_min_median_max(result, mean_df, x):
+    mean_df = mean_df[0]
+    div_x = x[3::3]
+
+    medians = [mean_df[mean_df <= div_x[0]].median(),
+               mean_df[(mean_df > div_x[0]) & (mean_df <= div_x[1])].median(),
+               mean_df[(mean_df > div_x[1]) & (mean_df <= div_x[2])].median()
+               ]
+
+    target_households = list()
+    target_kwhs = list()
+    for medi in medians:
+        idx = (mean_df - medi).abs().argmin()
+        household = mean_df.index[idx]
+        kwh = int(mean_df[idx])
+
+        target_households.append(household)
+        target_kwhs.append(kwh)
+
+    target_chks = list()
+    for household in target_households:
+        comp = result[0]['households_bill']['comp'][0][household]
+        single = result[0]['households_bill']['single'][0][household]
+
+        for idx in comp.index:
+            if comp[idx] < single[idx]:
+                target_chks.append(idx)
+                break
+
+    return (target_kwhs, target_chks)
+
+
 def analysis_processing_single(result, hist_df):
     in_db = dict()
     in_db['changePer'] = dict()
 
     # histogram data
     hist_values = hist_df.values
-    bins = 11
+    bins = 9
     y, x = np.histogram(hist_values, bins=bins)
+
+    target_kwhs, target_chks = get_min_median_max(result, hist_df, x)
+    in_db['targetKwhs'] = target_kwhs
+    in_db['targetChks'] = target_chks
+
+    # 순위 구하기
+    _rank = y.reshape(3, -1).sum(axis=1).argsort()
+    rank = np.array([0, 0, 0])
+    for idx, r in enumerate(_rank):
+        rank[r] = idx
+    in_db['rank'] = rank.tolist()
+
     x_round = x.round()
     x_str = list()
 
@@ -39,34 +83,28 @@ def analysis_processing_single(result, hist_df):
             "{}kWh~{}kWh".format(int(x_round[idx]), int(x_round[idx + 1] - 1))
         )
 
-    mean_value = hist_values[np.abs(
-        (hist_values - hist_values.mean())).argmin()]
-    hist_mean = 0
-    hist_mean = mt.floor(bins / 2)
-    for idx in range(len(x - 1)):
-        if (x[idx] < mean_value) and (x[idx + 1] >= mean_value):
-            hist_mean = idx
-            break
+    # mean_value = hist_values[np.abs(
+    #     (hist_values - hist_values.mean())).argmin()]
+    # hist_mean = 0
+    # hist_mean = mt.floor(bins / 2)
+    # for idx in range(len(x - 1)):
+    #     if (x[idx] < mean_value) and (x[idx + 1] >= mean_value):
+    #         hist_mean = idx
+    #         break
 
     x = x_str
-    hist_mean = idx
+    # hist_mean = idx
 
-    hist_min_sum = y[:hist_mean].sum()
-    hist_max_sum = y[hist_mean + 1:].sum()
-    hist_win = ""
-
-    if hist_min_sum > hist_max_sum:
-        hist_win = "min"
-    elif hist_min_sum < hist_max_sum:
-        hist_win = "max"
-    else:
-        hist_win = "draw"
+    # hist_min_sum = y[:hist_mean].sum()
+    # hist_max_sum = y[hist_mean + 1:].sum()
+    hist_win = "median" if rank.argmax() == 1 else \
+        ("max" if rank.argmax() == 2 else "min")
 
     y = y.tolist()
 
-    histogram = [{"x": _, "y": y[idx]} for idx, _ in enumerate(x)]
+    histogram = [{"x": _, "y": y[idx], "rank": int(
+        rank[mt.floor(idx / 3)])} for idx, _ in enumerate(x)]
     in_db['histogram'] = histogram
-    in_db['histMean'] = hist_mean
     in_db['histWin'] = hist_win
 
     for main_target, sub_target, item_name in db_process:
